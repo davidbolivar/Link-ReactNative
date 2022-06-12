@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import styles from "../Styles.js";
+import styles from "./styles.js";
 
 export default function Header(props) {
 	const { texto } = props;

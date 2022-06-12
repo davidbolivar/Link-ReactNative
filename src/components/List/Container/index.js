@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { Text, View } from "react-native";
-import ModalItem from "../Modal.js";
-import styles from "../../Styles.js";
-import ListItem from "./ListItem.js";
+import ModalItem from "../../Modal";
+import styles from "./styles.js";
+import ListItem from "../Item";
 
-export default function ListContainer(props) {
-	const { listItem, setListItem } = props;
-	// const [textItem, setTextItem] = useState();
+export default function ListContainer({ listItem, setListItem }) {
 	const [itemSelected, setItemSelected] = useState({});
 	const [modalVisible, setModalVisible] = useState(false);
 
@@ -30,7 +28,6 @@ export default function ListContainer(props) {
 		<>
 			<View style={styles.listadoItems}>
 				<Text style={styles.tituloLista}>MENSAJES ENVIADOS</Text>
-
 				<ListItem onHandlerModal={onHandlerModal} listItem={listItem} />
 			</View>
 

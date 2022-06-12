@@ -1,10 +1,7 @@
-import react from "react";
-import { Text, View, Button, Modal, StyleSheet } from "react-native";
-import styles from "../Styles.js";
+import { Text, View, Button, Modal } from "react-native";
+import styles from "./styles.js";
 
-export default function ModalItem(props) {
-	const { visible, onDelete, item, onCancel } = props;
-
+export default function ModalItem({ visible, onDelete, item, onCancel }) {
 	return (
 		<Modal animationType="slide" visible={visible}>
 			<View style={styles.modalCentered}>
