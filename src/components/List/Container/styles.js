@@ -16,6 +16,6 @@ export default styles = StyleSheet.create({
 		padding: 15,
 		alignItems: "center",
 		width: "100%",
-		flex: 1,
+		flex: 4,
 	},
 });

@@ -1,17 +1,10 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import React from "react";
+import Root from "./src";
+import { ActivityIndicator } from "react-native";
 import { useFonts } from "expo-font";
-import AppLoading from "expo-app-loading";
-import Header from "./src/components/Header";
-import MainScreen from "./src/screens/Main";
-import MessagesScreen from "./src/screens/Messages";
 
 export default function App() {
-	const [listItem, setListItem] = useState([{ id: 1, message: "Esto es una prueba", method: "email", target: "davidbolivarh@gmail.com" }]);
-	const [goTo, setGoTo] = useState("MainScreen");
-
-	let [fontsLoaded] = useFonts({
+	let [loaded] = useFonts({
 		openSans: require("./assets/fonts/OpenSans-Regular.ttf"),
 		openSansBold: require("./assets/fonts/OpenSans-Bold.ttf"),
 		openSansLight: require("./assets/fonts/OpenSans-Light.ttf"),
@@ -20,19 +13,7 @@ export default function App() {
 		OpenSansSemiBoldItalic: require("./assets/fonts/OpenSans-SemiBoldItalic.ttf"),
 	});
 
-	if (!fontsLoaded) return <AppLoading />;
+	if (!loaded) return <ActivityIndicator />;
 
-	console.log("GO TO", goTo);
-	return (
-		<>
-			<StatusBar style="auto" />
-			<View style={{ flex: 1 }}>
-				<Header texto={"LINK - SIEMPRE CONECTADOS"} />
-
-				{goTo === "MainScreen" && <MainScreen listItem={listItem} setListItem={setListItem} setGoTo={setGoTo} />}
-
-				{goTo === "MessagesScreen" && <MessagesScreen setListItem={setListItem} listItem={listItem} setGoTo={setGoTo} />}
-			</View>
-		</>
-	);
+	return <Root />;
 }

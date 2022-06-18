@@ -22,10 +22,8 @@ export default function ListItem(props) {
 	);
 
 	return (
-		<ScrollView>
-			<View style={styles.flex1}>
-				<FlatList data={listItem} renderItem={renderItem} keyExtractor={(item) => item.id} />
-			</View>
-		</ScrollView>
+		<View style={styles.flex1}>
+			<FlatList data={listItem} renderItem={renderItem} keyExtractor={(item) => item.id} />
+		</View>
 	);
 }

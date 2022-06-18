@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Button } from "react-native";
 import styles from "./styles.js";
 
-export default function ChangeScreenButton({ screen, setGoTo }) {
-	return <Button title={`Ir a ${screen}`} color="darkgray" onPress={() => setGoTo(screen)} />;
+export default function ChangeScreenButton({ screen, text, setGoTo }) {
+	return (
+		<View style={styles.container}>
+			<Button title={text} color="darkgray" onPress={() => setGoTo(screen)} />
+		</View>
+	);
 }
