@@ -10,7 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 CLASES_Y_DESAFIOS/
-Backup_20221012.zip
+backup*
 
 # macOS
 .DS_Store

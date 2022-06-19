@@ -10,5 +10,5 @@ export default function Header() {
 		},
 	});
 
-	return <Image source={require("../../../assets/other/Logo2.png")} resizeMode="cover" style={styles.image}></Image>;
+	return <>{/* <Image source={require("../../../assets/other/Logo2.png")} resizeMode="cover" style={styles.image}></Image>; */}</>;
 }
