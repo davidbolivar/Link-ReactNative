@@ -2,7 +2,8 @@ import React from "react";
 import Root from "./src";
 import { ActivityIndicator } from "react-native";
 import { useFonts } from "expo-font";
-
+import { Provider } from "react-redux";
+import store from "./src/store";
 export default function App() {
 	let [loaded] = useFonts({
 		openSans: require("./assets/fonts/OpenSans-Regular.ttf"),
@@ -15,5 +16,9 @@ export default function App() {
 
 	if (!loaded) return <ActivityIndicator />;
 
-	return <Root />;
+	return (
+		<Provider store={store}>
+			<Root />
+		</Provider>
+	);
 }

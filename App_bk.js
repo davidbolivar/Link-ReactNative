@@ -8,7 +8,7 @@ import MainScreen from "./src/screens/Main";
 import MessagesScreen from "./src/screens/Messages";
 
 export default function App() {
-	const [listItem, setListItem] = useState([{ id: 1, message: "Esto es una prueba", method: "email", target: "davidbolivarh@gmail.com" }]);
+	const [messageItem, setMessageItem] = useState([{ id: 1, message: "Esto es una prueba", method: "email", target: "davidbolivarh@gmail.com" }]);
 	const [goTo, setGoTo] = useState("MainScreen");
 
 	let [fontsLoaded] = useFonts({
@@ -27,9 +27,9 @@ export default function App() {
 		<>
 			<StatusBar style="auto" />
 			<View style={{ flex: 1 }}>
-				{goTo === "MainScreen" && <MainScreen listItem={listItem} setListItem={setListItem} setGoTo={setGoTo} />}
+				{goTo === "MainScreen" && <MainScreen messageItem={messageItem} setMessageItem={setMessageItem} setGoTo={setGoTo} />}
 
-				{goTo === "MessagesScreen" && <MessagesScreen setListItem={setListItem} listItem={listItem} setGoTo={setGoTo} />}
+				{goTo === "MessagesScreen" && <MessagesScreen setMessageItem={setMessageItem} messageItem={messageItem} setGoTo={setGoTo} />}
 			</View>
 		</>
 	);

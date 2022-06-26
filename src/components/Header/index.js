@@ -1,4 +1,4 @@
-import { View, Image } from "react-native";
+import { Image } from "react-native";
 import { StyleSheet } from "react-native";
 // import styles from "./styles.js";
 
@@ -10,5 +10,5 @@ export default function Header() {
 		},
 	});
 
-	return <>{/* <Image source={require("../../../assets/other/Logo2.png")} resizeMode="cover" style={styles.image}></Image>; */}</>;
+	return <Image source={require("../../../assets/other/Logo2.png")} resizeMode="cover" style={styles.image}></Image>;
 }

@@ -1,9 +1,12 @@
 import React from "react";
-import { Text, View, Button, FlatList, ScrollView } from "react-native";
+import { Text, View, Button, FlatList } from "react-native";
 import styles from "./styles.js";
+import { useSelector, useDispatch } from "react-redux";
 
-export default function ListItem(props) {
-	const { listItem, onHandlerModal } = props;
+export default function MessageItem({ onHandlerModal }) {
+	const dispatch = useDispatch();
+	const messages = useSelector((state) => state.message.messages);
+	const selected = useSelector((state) => state.message.selected);
 
 	const renderItem = (data) => (
 		<View style={styles.containerLista}>
@@ -23,7 +26,7 @@ export default function ListItem(props) {
 
 	return (
 		<View style={styles.flex1}>
-			<FlatList data={listItem} renderItem={renderItem} keyExtractor={(item) => item.id} />
+			<FlatList data={messages} renderItem={renderItem} keyExtractor={(item) => item.id} />
 		</View>
 	);
 }

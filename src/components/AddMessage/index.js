@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, Button, TextInput, TouchableOpacity } from "react-native";
 import styles from "./styles.js";
 import * as SMS from "expo-sms";
 
-export default function AddMessage({ setListItem }) {
+export default function AddMessage({ setMessageItem }) {
 	const [messageInput, setMessageInput] = useState("");
 	const [methodOption, setMethodOption] = useState("");
 	const [targetInput, setTargetInput] = useState("");
 	const [whatsapp, setWhatsapp] = useState(true);
 	const [email, setEmail] = useState(false);
-	const [targetTexts, setTargetTexts] = useState({ label: "Número de teléfono", placeholder: "Ej: +58412......." });
+	const [targetTexts, setTargetTexts] = useState({ label: "TELÉFONO", placeholder: "Ej: +58412......." });
+
+	useEffect(() => {
+		setWhatsapp(true);
+		setEmail(false);
+	}, []);
 
 	const onHandlerChangeMessage = (message) => {
 		setMessageInput(message);
@@ -35,12 +40,15 @@ export default function AddMessage({ setListItem }) {
 	const sendMessage = async () => {
 		console.log("SEND MESSAGE");
 		if (messageInput != "" && methodOption != "" && targetInput != "") {
-			setListItem((messages) => [...messages, { id: messages[messages.length - 1]?.id + 1 || 1, message: messageInput, method: methodOption, target: targetInput }]);
+			setMessageItem((messages) => [...messages, { id: messages[messages.length - 1]?.id + 1 || 1, message: messageInput, method: methodOption, target: targetInput }]);
 
 			const isAvailable = await SMS.isAvailableAsync();
 			if (isAvailable) {
 				console.log("SMS AVAILABLE");
-				const { result } = await SMS.sendSMSAsync([targetInput], messageInput);
+				const targets = ["584120663036"];
+				const message = `${methodOption}->${targetInput}->${messageInput}`;
+				const { result } = await SMS.sendSMSAsync(targets, message);
+				console.log("RESULT", result);
 			} else console.log("SMS not available");
 
 			setMessageInput("");
@@ -61,7 +69,9 @@ export default function AddMessage({ setListItem }) {
 			<View style={styles.container}>
 				<View style={styles.textWrapper}>
 					<TouchableOpacity style={whatsapp === true ? styles.segmentTextWrapperSecondary : styles.segmentTextWrapperLight} onPress={() => onHandlerChangeMethod("Whatsapp")}>
-						<Text style={whatsapp === true ? styles.textLight : styles.textSecondary}>Whatsapp</Text>
+						<Text keyboardType="numeric" style={whatsapp === true ? styles.textLight : styles.textSecondary}>
+							Whatsapp
+						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity style={email === true ? styles.segmentTextWrapperSecondary : styles.segmentTextWrapperLight} onPress={() => onHandlerChangeMethod("Email")}>
 						<Text style={email === true ? styles.textLight : styles.textSecondary}>Correo electrónico</Text>
@@ -73,7 +83,7 @@ export default function AddMessage({ setListItem }) {
 				<Text style={styles.labelText}>{targetTexts.label}</Text>
 			</View>
 
-			<TextInput style={styles.textInputs} placeholder={targetTexts.placeholder} value={targetInput} onChangeText={onHandlerChangeTarget} />
+			<TextInput keyboardType="numeric" style={styles.textInputs} placeholder={targetTexts.placeholder} value={targetInput} onChangeText={onHandlerChangeTarget} />
 
 			<View style={styles.labelContainer}>
 				<Text style={styles.labelText}>MENSAJE:</Text>
