@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Button, TextInput, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { Text, View, Button, TextInput, TouchableOpacity, Keyboard } from "react-native";
 import styles from "./styles.js";
 import * as SMS from "expo-sms";
+import { useDispatch, useSelector } from "react-redux";
+import { addMessage } from "../../store/actions/message.action";
 
-export default function AddMessage({ setMessageItem }) {
+export default function AddMessage() {
+	const dispatch = useDispatch();
+	const messages = useSelector((state) => state.message.messages);
 	const [messageInput, setMessageInput] = useState("");
-	const [methodOption, setMethodOption] = useState("");
+	const [methodOption, setMethodOption] = useState("Whatsapp");
 	const [targetInput, setTargetInput] = useState("");
 	const [whatsapp, setWhatsapp] = useState(true);
 	const [email, setEmail] = useState(false);
 	const [targetTexts, setTargetTexts] = useState({ label: "TELÉFONO", placeholder: "Ej: +58412......." });
 
-	useEffect(() => {
-		setWhatsapp(true);
-		setEmail(false);
-	}, []);
-
 	const onHandlerChangeMessage = (message) => {
+		console.log("MENSAJE:", message);
+		console.log("TIPO DE MENSAJE:", typeof message);
 		setMessageInput(message);
 	};
 
@@ -38,21 +39,18 @@ export default function AddMessage({ setMessageItem }) {
 	};
 
 	const sendMessage = async () => {
+		Keyboard.dismiss();
 		console.log("SEND MESSAGE");
 		if (messageInput != "" && methodOption != "" && targetInput != "") {
-			setMessageItem((messages) => [...messages, { id: messages[messages.length - 1]?.id + 1 || 1, message: messageInput, method: methodOption, target: targetInput }]);
-
 			const isAvailable = await SMS.isAvailableAsync();
+			dispatch(addMessage({ id: messages[messages.length - 1]?.id + 1 || 1, message: messageInput, method: methodOption, target: targetInput }));
 			if (isAvailable) {
 				console.log("SMS AVAILABLE");
-				const targets = ["584120663036"];
 				const message = `${methodOption}->${targetInput}->${messageInput}`;
-				const { result } = await SMS.sendSMSAsync(targets, message);
-				console.log("RESULT", result);
+				await SMS.sendSMSAsync(targetInput, message);
 			} else console.log("SMS not available");
 
 			setMessageInput("");
-			setMethodOption("");
 			setTargetInput("");
 		}
 	};
