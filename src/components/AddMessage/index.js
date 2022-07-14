@@ -1,19 +1,65 @@
-import React, { useState } from "react";
-import { Text, View, Button, TextInput, TouchableOpacity, Keyboard } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Text, View, Button, TextInput, TouchableOpacity, Keyboard, Switch } from "react-native";
 import styles from "./styles.js";
 import * as SMS from "expo-sms";
 import { useDispatch, useSelector } from "react-redux";
 import { addMessage } from "../../store/actions/message.action";
+import * as Location from "expo-location";
+import * as Contacts from "expo-contacts";
 
 export default function AddMessage() {
 	const dispatch = useDispatch();
+	// Location ---------------------------------------------------------------
+	const [location, setLocation] = useState(null);
+	const [errorMsg, setErrorMsg] = useState(null);
+	const [isEnabled, setIsEnabled] = useState(false);
+	const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+	// Messages list -----------------------------------------------------------
 	const messages = useSelector((state) => state.message.messages);
+	// Inputs ------------------------------------------------------------------
 	const [messageInput, setMessageInput] = useState("");
 	const [methodOption, setMethodOption] = useState("Whatsapp");
 	const [targetInput, setTargetInput] = useState("");
+	// Service select ----------------------------------------------------------
 	const [whatsapp, setWhatsapp] = useState(true);
 	const [email, setEmail] = useState(false);
+	// Service label -----------------------------------------------------------
 	const [targetTexts, setTargetTexts] = useState({ label: "TELÉFONO", placeholder: "Ej: +58412......." });
+
+	// CONTACTS USE EFFECT ----------------------------------------------------
+	useEffect(() => {
+		(async () => {
+			const { status } = await Contacts.requestPermissionsAsync();
+			if (status === "granted") {
+				const { data } = await Contacts.getContactsAsync({
+					fields: [Contacts.Fields.Emails],
+				});
+
+				if (data.length > 0) {
+					const contact = data[0];
+					console.log("CANTIDAD DE CONTACTOS", data.length);
+				}
+			}
+		})();
+	}, []);
+
+	// LOCATION USE EFFECT ----------------------------------------------------
+	useEffect(() => {
+		(async () => {
+			let { status } = await Location.requestForegroundPermissionsAsync();
+			if (status !== "granted") {
+				setErrorMsg("Permission to access location was denied");
+				return;
+			}
+
+			let location = await Location.getCurrentPositionAsync({});
+			setLocation(location);
+		})();
+	}, []);
+
+	let text = "Waiting..";
+	if (errorMsg) text = errorMsg;
+	else if (location) text = JSON.stringify(location);
 
 	const onHandlerChangeMessage = (message) => {
 		console.log("MENSAJE:", message);
@@ -46,7 +92,8 @@ export default function AddMessage() {
 			dispatch(addMessage({ id: messages[messages.length - 1]?.id + 1 || 1, message: messageInput, method: methodOption, target: targetInput }));
 			if (isAvailable) {
 				console.log("SMS AVAILABLE");
-				const message = `${methodOption}->${targetInput}->${messageInput}`;
+				let message = `${methodOption}->${targetInput}->${messageInput}`;
+				if (location && isEnabled) message = `${message}->${location.coords.latitude},${location.coords.longitude}`;
 				await SMS.sendSMSAsync(targetInput, message);
 			} else console.log("SMS not available");
 
@@ -89,8 +136,19 @@ export default function AddMessage() {
 
 			<TextInput style={[styles.textInputs, { height: 80, padding: 10, textAlignVertical: "top" }]} numberOfLines={10} multiline={true} value={messageInput} onChangeText={onHandlerChangeMessage} />
 
+			<View style={[styles.labelContainer, styles.locationView]}>
+				<Text style={styles.labelText}>COMPARTIR MI UBICACIÓN:</Text>
+				<Switch trackColor={{ false: "#767577", true: "#029613" }} thumbColor={isEnabled ? "#ffffff" : "#f4f3f4"} ios_backgroundColor="#3e3e3e" onValueChange={toggleSwitch} value={isEnabled} />
+			</View>
+
 			<View style={styles.btn1}>
 				<Button title="Enviar mensaje" color="darkgray" onPress={sendMessage} />
+			</View>
+
+			{/* SWITCH PARA ACEPTAR COMPARTIR UBICACIÓN */}
+
+			<View>
+				<Text>{text}</Text>
 			</View>
 
 			{/* <Text style={styles.textNormal}>NUEVO MENSAJE</Text>

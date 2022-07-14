@@ -65,10 +65,15 @@ export default styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 	btn1: {
-		marginTop: 20,
+		marginTop: 0,
 	},
 	labelContainer: {
 		padding: 10,
+		alignItems: "center",
+	},
+	locationView: {
+		// padding: 10,
+		flexDirection: "row",
 	},
 	labelText: {
 		color: Colors.light,
