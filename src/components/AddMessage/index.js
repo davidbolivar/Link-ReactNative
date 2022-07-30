@@ -14,7 +14,7 @@ export default function AddMessage() {
 	dispatch(selectAllMessages());
 
 	// SERVER_NUMBER ----------------------------------------------------------
-	const SERVER_PHONE_NUMBER = "+584121300783";
+	const SERVER_PHONE_NUMBER = "+5491126469206";
 	// Location ---------------------------------------------------------------
 	const [locationInfo, setLocationInfo] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
