@@ -3,19 +3,24 @@ import { Text, View, Button, TextInput, TouchableOpacity, Keyboard, Switch } fro
 import styles from "./styles.js";
 import * as SMS from "expo-sms";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessage } from "../../store/actions/message.action";
+import { addMessage, selectAllMessages } from "../../store/actions/message.action";
 import * as Location from "expo-location";
 import * as Contacts from "expo-contacts";
 
 export default function AddMessage() {
 	const dispatch = useDispatch();
+
+	// DESPACHAMOS LOS MENSAJES PARA QUE AL CAMBIAR A LA LISTA ESTÉN DISPONIBLES
+	dispatch(selectAllMessages());
+
+	// SERVER_NUMBER ----------------------------------------------------------
+	const SERVER_PHONE_NUMBER = "+584121300783";
 	// Location ---------------------------------------------------------------
-	const [location, setLocation] = useState(null);
+	const [locationInfo, setLocationInfo] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
-	const [isEnabled, setIsEnabled] = useState(false);
-	const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
-	// Messages list -----------------------------------------------------------
-	const messages = useSelector((state) => state.message.messages);
+	const [shareLocation, setShareLocation] = useState(false);
+	const toggleSwitch = () => setShareLocation((previousState) => !previousState);
+
 	// Inputs ------------------------------------------------------------------
 	const [messageInput, setMessageInput] = useState("");
 	const [methodOption, setMethodOption] = useState("Whatsapp");
@@ -53,17 +58,20 @@ export default function AddMessage() {
 			}
 
 			let location = await Location.getCurrentPositionAsync({});
-			setLocation(location);
+			setLocationInfo(location);
 		})();
 	}, []);
 
-	let text = "Waiting..";
+	const locationUrl = (locationInfo) => {
+		if (locationInfo) return `https://www.google.com/maps/search/?api=1&query=${locationInfo.coords.latitude},${locationInfo.coords.longitude}`;
+		else return null;
+	};
+
+	let text = "Esperando..";
 	if (errorMsg) text = errorMsg;
-	else if (location) text = JSON.stringify(location);
+	else if (locationInfo) text = "Lat: " + locationInfo.coords.latitude + " Lng: " + locationInfo.coords.longitude;
 
 	const onHandlerChangeMessage = (message) => {
-		console.log("MENSAJE:", message);
-		console.log("TIPO DE MENSAJE:", typeof message);
 		setMessageInput(message);
 	};
 
@@ -73,7 +81,7 @@ export default function AddMessage() {
 			setWhatsapp(true);
 			setEmail(false);
 			setTargetTexts({ label: "TELÉFONO", placeholder: "Ej: +58412......." });
-		} else if (method === "Email") {
+		} else if (method === "Correo") {
 			setEmail(true);
 			setWhatsapp(false);
 			setTargetTexts({ label: "CORREO ELECTRÓNICO", placeholder: "Ej: pedroperez@gmail.com" });
@@ -89,12 +97,14 @@ export default function AddMessage() {
 		console.log("SEND MESSAGE");
 		if (messageInput != "" && methodOption != "" && targetInput != "") {
 			const isAvailable = await SMS.isAvailableAsync();
-			dispatch(addMessage({ id: messages[messages.length - 1]?.id + 1 || 1, message: messageInput, method: methodOption, target: targetInput }));
+
+			dispatch(addMessage({ message: messageInput, method: methodOption, target: targetInput, location: locationUrl(locationInfo) }));
+
 			if (isAvailable) {
 				console.log("SMS AVAILABLE");
 				let message = `${methodOption}->${targetInput}->${messageInput}`;
-				if (location && isEnabled) message = `${message}->${location.coords.latitude},${location.coords.longitude}`;
-				await SMS.sendSMSAsync(targetInput, message);
+				if (locationInfo && shareLocation) message = `${message}->${locationInfo.coords.latitude},${locationInfo.coords.longitude}`;
+				await SMS.sendSMSAsync(SERVER_PHONE_NUMBER, message);
 			} else console.log("SMS not available");
 
 			setMessageInput("");
@@ -114,11 +124,9 @@ export default function AddMessage() {
 			<View style={styles.container}>
 				<View style={styles.textWrapper}>
 					<TouchableOpacity style={whatsapp === true ? styles.segmentTextWrapperSecondary : styles.segmentTextWrapperLight} onPress={() => onHandlerChangeMethod("Whatsapp")}>
-						<Text keyboardType="numeric" style={whatsapp === true ? styles.textLight : styles.textSecondary}>
-							Whatsapp
-						</Text>
+						<Text style={whatsapp === true ? styles.textLight : styles.textSecondary}>Whatsapp</Text>
 					</TouchableOpacity>
-					<TouchableOpacity style={email === true ? styles.segmentTextWrapperSecondary : styles.segmentTextWrapperLight} onPress={() => onHandlerChangeMethod("Email")}>
+					<TouchableOpacity style={email === true ? styles.segmentTextWrapperSecondary : styles.segmentTextWrapperLight} onPress={() => onHandlerChangeMethod("Correo")}>
 						<Text style={email === true ? styles.textLight : styles.textSecondary}>Correo electrónico</Text>
 					</TouchableOpacity>
 				</View>
@@ -128,7 +136,7 @@ export default function AddMessage() {
 				<Text style={styles.labelText}>{targetTexts.label}</Text>
 			</View>
 
-			<TextInput keyboardType="numeric" style={styles.textInputs} placeholder={targetTexts.placeholder} value={targetInput} onChangeText={onHandlerChangeTarget} />
+			<TextInput keyboardType={methodOption == "Whatsapp" ? "phone-pad" : "email-address"} style={styles.textInputs} placeholder={targetTexts.placeholder} value={targetInput} onChangeText={onHandlerChangeTarget} />
 
 			<View style={styles.labelContainer}>
 				<Text style={styles.labelText}>MENSAJE:</Text>
@@ -136,20 +144,20 @@ export default function AddMessage() {
 
 			<TextInput style={[styles.textInputs, { height: 80, padding: 10, textAlignVertical: "top" }]} numberOfLines={10} multiline={true} value={messageInput} onChangeText={onHandlerChangeMessage} />
 
+			{/* SWITCH PARA ACEPTAR COMPARTIR UBICACIÓN */}
 			<View style={[styles.labelContainer, styles.locationView]}>
 				<Text style={styles.labelText}>COMPARTIR MI UBICACIÓN:</Text>
-				<Switch trackColor={{ false: "#767577", true: "#029613" }} thumbColor={isEnabled ? "#ffffff" : "#f4f3f4"} ios_backgroundColor="#3e3e3e" onValueChange={toggleSwitch} value={isEnabled} />
+				<Switch trackColor={{ false: "#767577", true: "#029613" }} thumbColor={shareLocation ? "#ffffff" : "#f4f3f4"} ios_backgroundColor="#3e3e3e" onValueChange={toggleSwitch} value={shareLocation} />
 			</View>
 
 			<View style={styles.btn1}>
 				<Button title="Enviar mensaje" color="darkgray" onPress={sendMessage} />
 			</View>
 
-			{/* SWITCH PARA ACEPTAR COMPARTIR UBICACIÓN */}
+			{/* TEXT PARA MOSTRAR LAS COORDENADAS */}
+			{/* <Text style={styles.labelContainer}>{text}</Text> */}
 
-			<View>
-				<Text>{text}</Text>
-			</View>
+			<View></View>
 
 			{/* <Text style={styles.textNormal}>NUEVO MENSAJE</Text>
 			<TextInput style={styles.textInputs} placeholder="Método de envío" value={methodOption} onChangeText={onHandlerChangeMethod} />

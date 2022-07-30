@@ -1,10 +1,10 @@
-import { MESSAGES } from "../../constants/data";
+// import { MESSAGES } from "../../constants/data";
 import { messageTypes } from "../types";
 
-const { SELECT_MESSAGE, DELETE_MESSAGE, ADD_MESSAGE } = messageTypes;
+const { SELECT_MESSAGE, DELETE_MESSAGE, ADD_MESSAGE, SELECT_ALL_MESSAGES } = messageTypes;
 
 const initialState = {
-	messages: MESSAGES,
+	messages: [],
 	selected: null,
 };
 
@@ -30,6 +30,11 @@ const MessageReducer = (state = initialState, action) => {
 			return {
 				...state,
 				messages: [...state.messages, action.message],
+			};
+		case SELECT_ALL_MESSAGES:
+			return {
+				...state,
+				messages: action.message,
 			};
 		default:
 			return state;

@@ -2,21 +2,27 @@ import React, { useEffect } from "react";
 import { Text, View, Button, FlatList, TouchableOpacity } from "react-native";
 import styles from "./styles.js";
 import { useSelector, useDispatch } from "react-redux";
-import { selectedMessage } from "../../../store/actions/message.action";
+import { selectedMessage, selectAllMessages } from "../../../store/actions/message.action";
+
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function MessageItem({ onHandlerModal }) {
 	const dispatch = useDispatch();
-	const messages = useSelector((state) => state.message.messages);
-	const selected = useSelector((state) => state.message.selected);
 
-	useEffect(() => {}, [messages]);
+	useFocusEffect(
+		React.useCallback(() => {
+			dispatch(selectAllMessages());
+		}, [])
+	);
+
+	const messages = useSelector((state) => state.message.messages);
 
 	const onHandlerSelect = (id) => {
 		console.log("OnHandlerSelect", id);
 		dispatch(selectedMessage(id));
 	};
 
-	const onHandlerDelete = (id) => {};
+	// const onHandlerDelete = (id) => {};
 
 	const renderItem = (data) => (
 		<TouchableOpacity
@@ -26,8 +32,14 @@ export default function MessageItem({ onHandlerModal }) {
 				onHandlerModal(data.item.id);
 			}}
 		>
-			<Text style={styles.textLista}>
-				#{data.item.id} - {data.item.method} enviado a {data.item.target}. {"\n"} Mensaje: {data.item.message}
+			<Text Text style={styles.textLista}>
+				<Text style={styles.textListaNumber}>
+					{data.item.id}. {data.item.method}: {data.item.target}
+				</Text>
+				{"\n"}
+				<Text>{data.item.message}</Text>
+				{"\n"}
+				<Text style={styles.textListaLink}>{data.item.location}</Text>
 			</Text>
 		</TouchableOpacity>
 	);
