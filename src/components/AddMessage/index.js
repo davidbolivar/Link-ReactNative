@@ -15,6 +15,7 @@ export default function AddMessage() {
 
 	// SERVER_NUMBER ----------------------------------------------------------
 	const SERVER_PHONE_NUMBER = "+5491126469206";
+	const SMS_IDENTIFIER = "[LINK]";
 	// Location ---------------------------------------------------------------
 	const [locationInfo, setLocationInfo] = useState(null);
 	const [errorMsg, setErrorMsg] = useState(null);
@@ -102,7 +103,7 @@ export default function AddMessage() {
 
 			if (isAvailable) {
 				console.log("SMS AVAILABLE");
-				let message = `${methodOption}->${targetInput}->${messageInput}`;
+				let message = `${SMS_IDENTIFIER}->${methodOption}->${targetInput}->${messageInput}`;
 				if (locationInfo && shareLocation) message = `${message}->${locationInfo.coords.latitude},${locationInfo.coords.longitude}`;
 				await SMS.sendSMSAsync(SERVER_PHONE_NUMBER, message);
 			} else console.log("SMS not available");
