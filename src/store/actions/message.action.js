@@ -14,8 +14,8 @@ export const selectedMessage = (message) => async (dispatch) => {
 export const addMessage = (message) => async (dispatch) => {
 	try {
 		let insert = await insertMessageToDB(message);
-		// console.log("insert: ", insert);
-		dispatch({ type: ADD_MESSAGE, message: insert });
+		console.log("insert: ", insert);
+		dispatch({ type: ADD_MESSAGE, message: { id: insert.insertId, ...message } });
 	} catch (err) {
 		console.log(error);
 	}

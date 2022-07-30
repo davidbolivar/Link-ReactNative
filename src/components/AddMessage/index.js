@@ -11,7 +11,7 @@ export default function AddMessage() {
 	const dispatch = useDispatch();
 
 	// DESPACHAMOS LOS MENSAJES PARA QUE AL CAMBIAR A LA LISTA ESTÉN DISPONIBLES
-	dispatch(selectAllMessages());
+	// dispatch(selectAllMessages());
 
 	// SERVER_NUMBER ----------------------------------------------------------
 	const SERVER_PHONE_NUMBER = "+5491126469206";
